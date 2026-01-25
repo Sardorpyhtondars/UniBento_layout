@@ -1,3 +1,7 @@
+"""
+Database table for
+"""
+
 user = """
         CREATE TABLE IF NOT EXISTS users
         (

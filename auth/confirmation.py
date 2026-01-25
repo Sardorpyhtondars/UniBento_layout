@@ -1,3 +1,7 @@
+"""
+Generates a code and sends to the user
+"""
+
 import random
 import smtplib
 from email.mime.multipart import MIMEMultipart

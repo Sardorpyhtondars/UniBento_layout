@@ -1,3 +1,7 @@
+"""
+
+"""
+
 from collections.abc import Callable
 from typing import Any
 
@@ -50,11 +54,6 @@ def validate() -> Callable | bool:
         query1 = "DELETE FROM codes WHERE code = %s"
         params1 = (code,)
         execute_query(query=query1, params=params1)
-
-        query2 = "UPDATE users SET is_active=True WHERE email = %s"
-        params2 = (user_code['email'],)
-        execute_query(query=query2, params=params2)
-
         return True
     else:
         print("Invalid code")
