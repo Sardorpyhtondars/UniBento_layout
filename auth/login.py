@@ -16,8 +16,6 @@ def register() -> bool:
     email: str = input("Email: ")
     password: str = input("Password: ")
 
-    # check email if exists or not
-    # ask password twice
     query: str = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
     params: tuple[str, str, str] = (username, email, password,)
 
@@ -37,7 +35,6 @@ def register() -> bool:
     else:
         print("Something went wrong, try again later")
         return False
-
 
 def validate() -> Callable | bool:
     """
@@ -96,7 +93,7 @@ def get_active_user() -> DictRow | None | list[tuple[Any, ...]]:
 def logout_all() -> None:
     """
     Update all user is_login to False
-    :return:
+    :return: all users logged out
     """
     query1 = "UPDATE users SET is_login=False"
     execute_query(query=query1)

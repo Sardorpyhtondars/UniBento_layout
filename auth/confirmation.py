@@ -3,20 +3,16 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from core.config import EMAIL_USER, EMAIL_PASS
-
 from core.db_settings import execute_query
 
-
-def send_email(recipient_email, subject, body):
+def send_email(recipient_email: str, subject:str, body:str)->bool:
     """
     Send a text email using Gmail SMTP server
-
     Args:
         recipient_email: Recipient's email address
         subject: Email subject
         body: Email body text
     """
-
     msg = MIMEMultipart()
     msg['From'] = EMAIL_USER
     msg['To'] = recipient_email
@@ -29,8 +25,6 @@ def send_email(recipient_email, subject, body):
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(EMAIL_USER, EMAIL_PASS)
-
-        # Send email
         server.send_message(msg)
         return True
 
@@ -42,7 +36,11 @@ def send_email(recipient_email, subject, body):
             server.quit()
 
 
-def generate_code(user_email):
+def generate_code(user_email:str) -> str:
+    """
+    Generate a random 6-digit code and save it to database
+    :return: generate and save code in database
+    """
     code = str(random.randint(100000, 999999))
     query = "SELECT * FROM codes WHERE code = (%s)"
     params = (code,)
