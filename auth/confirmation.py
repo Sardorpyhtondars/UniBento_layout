@@ -2,32 +2,36 @@ import random
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-from core.db_settings import execute_query
 from core.config import EMAIL_USER, EMAIL_PASS
 
+from core.db_settings import execute_query
 
-def send_email(recipient_email: str, subject: str, body: str) -> bool:
-    """
-    Sends an email using smtplib server
-    :param recipient_email: Email of the recipient
-    :param subject: Subject of the email
-    :param body: Body of the email
-    :return: True if email was sent
-    """
-    massage = MIMEMultipart()
-    massage['From'] = EMAIL_USER
-    massage['To'] = recipient_email
-    massage['Subject'] = subject
 
-    massage.attach(MIMEText(body, 'plain'))
+def send_email(recipient_email, subject, body):
+    """
+    Send a text email using Gmail SMTP server
+
+    Args:
+        recipient_email: Recipient's email address
+        subject: Email subject
+        body: Email body text
+    """
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_USER
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
 
     server = None
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(EMAIL_USER, EMAIL_PASS)
-        server.send_message(massage)
+
+        # Send email
+        server.send_message(msg)
         return True
 
     except Exception as e:
@@ -38,23 +42,18 @@ def send_email(recipient_email: str, subject: str, body: str) -> bool:
             server.quit()
 
 
-def generate_code(user_email: str) -> int:
-    """
-    Generates a random 6 character code
-    :param user_email: user's email from which email will be sent
-    :return: code
-    """
+def generate_code(user_email):
     code = str(random.randint(100000, 999999))
-
-    query = "SELECT * FROM codes WHERE code = %s"
+    query = "SELECT * FROM codes WHERE code = (%s)"
     params = (code,)
     result = execute_query(query=query, params=params, fetch="one")
-
     if result:
         return generate_code(user_email)
-
     query1 = "INSERT INTO codes (email, code) VALUES (%s, %s)"
     params1 = (user_email, code)
-    execute_query(query=query1, params=params1)
-
-    return code
+    if execute_query(query=query1, params=params1):
+        print("Code sent to your email")
+        print("Code", code)
+        return code
+    print("Something went wrong, try again later")
+    return None
