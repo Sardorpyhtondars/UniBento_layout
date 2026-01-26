@@ -1,5 +1,5 @@
 """
-Database table for
+Database table for UniBento project
 """
 
 user = """
@@ -9,6 +9,7 @@ user = """
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
+            is_admin BOOLEAN DEFAULT FALSE,
             is_login BOOLEAN DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) \
@@ -29,20 +30,20 @@ menu_products = """
         CREATE TABLE IF NOT EXISTS menu_products
         (
             id BIGSERIAL PRIMARY KEY,
-            date_of_menu TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            menu_date DATE NOT NULL,
             product_id BIGINT REFERENCES products(id) ON DELETE CASCADE,
-            amount INTEGER NOT NULL,
+            amount INTEGER NOT NULL CHECK (amount > 0),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) \
             """
 
-timetable = """
+timeslots = """
         CREATE TABLE IF NOT EXISTS timetable
         (
             id BIGSERIAL PRIMARY KEY,
-            start_time VARCHAR(255) NOT NULL,
-            end_time VARCHAR(255) NOT NULL,
-            seats INTEGER NOT NULL,
+            start_time TIME NOT NULL,
+            end_time TIME NOT NULL,
+            seats INTEGER NOT NULL CHECK (seats > 0),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) \
             """
@@ -51,11 +52,11 @@ orders = """
         (
             id BIGSERIAL PRIMARY KEY,
             user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-            menu_id BIGINT REFERENCES menu_products(id),
-            amount INTEGER NOT NULL,
-            timeslot_id BIGINT REFERENCES timetable(id),
-            status VARCHAR(255) NOT NULL,
-            order_type VARCHAR(255) NOT NULL,
+            menu_product_id BIGINT REFERENCES menu_products(id) ON DELETE CASCADE,
+            amount INTEGER NOT NULL CHECK (amount > 0),
+            timeslot_id BIGINT REFERENCES timeslots(id),
+            status VARCHAR(255) NOT NULL, -- pending | canceled | completed
+            order_type VARCHAR(255) NOT NULL, -- in_hall | take_away
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) \
             """
